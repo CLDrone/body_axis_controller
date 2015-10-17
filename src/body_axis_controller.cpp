@@ -66,16 +66,24 @@ geometry_msgs::PoseStamped BodyAxisController::transferBodyAxisToLocal(geometry_
 {
 	geometry_msgs::PoseStamped transferedLocalPosition;
 
-	tf::Pose pose;
-	tf::poseMsgToTF(currentPosition.pose,pose);
-	double yaw_angle = tf::getYaw(pose.getRotation());
-    transferedLocalPosition.pose.position.x = currentPosition.pose.position.x + bodyAxisPosition.pose.position.x * cos(yaw_angle) - 
-    										bodyAxisPosition.pose.position.y * sin(yaw_angle);
-    transferedLocalPosition.pose.position.y = currentPosition.pose.position.y + bodyAxisPosition.pose.position.x * sin(yaw_angle) + 
-    										bodyAxisPosition.pose.position.y * cos(yaw_angle);
+	tf::Pose currentPose;
+	tf::poseMsgToTF(currentPosition.pose,currentPose);
+	double yawAngle = tf::getYaw(currentPose.getRotation());
+    
+    tf::Pose bodyAxisPose;
+    tf::poseMsgToTF(bodyAxisPosition.pose,bodyAxisPose);
+    double targetYawAngle = tf::getYaw(bodyAxisPose.getRotation());
+    ROS_INFO_STREAM("target yaw angel" << targetYawAngle*180/3.1415926);
+    double transferedYawAngle = yawAngle + targetYawAngle;
+    transferedLocalPosition.pose.orientation = tf::createQuaternionMsgFromYaw(transferedYawAngle);
+
+
+	transferedLocalPosition.pose.position.x = currentPosition.pose.position.x + bodyAxisPosition.pose.position.x * cos(yawAngle) - 
+    										bodyAxisPosition.pose.position.y * sin(yawAngle);
+    transferedLocalPosition.pose.position.y = currentPosition.pose.position.y + bodyAxisPosition.pose.position.x * sin(yawAngle) + 
+    										bodyAxisPosition.pose.position.y * cos(yawAngle);
     transferedLocalPosition.pose.position.z = currentPosition.pose.position.z + bodyAxisPosition.pose.position.z;
     
-    transferedLocalPosition.pose.orientation = currentPosition.pose.orientation;
 
     return transferedLocalPosition;
 
