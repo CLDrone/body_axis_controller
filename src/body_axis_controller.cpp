@@ -70,13 +70,14 @@ geometry_msgs::PoseStamped BodyAxisController::transferBodyAxisToLocal(geometry_
 	tf::poseMsgToTF(currentPosition.pose,currentPose);
 	double yawAngle = tf::getYaw(currentPose.getRotation());
     
+    /*
     tf::Pose bodyAxisPose;
     tf::poseMsgToTF(bodyAxisPosition.pose,bodyAxisPose);
     double targetYawAngle = tf::getYaw(bodyAxisPose.getRotation());
     ROS_INFO_STREAM("target yaw angel" << targetYawAngle*180/3.1415926);
     double transferedYawAngle = yawAngle + targetYawAngle;
     transferedLocalPosition.pose.orientation = tf::createQuaternionMsgFromYaw(transferedYawAngle);
-
+    */
 
 	transferedLocalPosition.pose.position.x = currentPosition.pose.position.x + bodyAxisPosition.pose.position.x * cos(yawAngle) - 
     										bodyAxisPosition.pose.position.y * sin(yawAngle);
